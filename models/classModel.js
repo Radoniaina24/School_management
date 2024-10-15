@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const classSchema = new mongoose.Schema({
   level: { type: String, require: true },
   subject: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }],
-  teacher: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
+  //teacher: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   student: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
 });
-const Class = mongoose.model("Subject", classSchema);
+const Class = mongoose.model("Class", classSchema);
 module.exports = Class;
