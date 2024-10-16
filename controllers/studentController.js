@@ -12,8 +12,8 @@ async function postStudent(req, res) {
     classe,
   } = req.body;
   try {
-    const classeExist = await Student.findOne({ firstname });
-    if (classeExist) {
+    const studentExist = await Student.findOne({ firstname });
+    if (studentExist) {
       throw new Error("Student already exist");
     }
     //create student
