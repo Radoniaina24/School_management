@@ -9,7 +9,7 @@ const studentSchema = new mongoose.Schema({
   email: { type: String },
   school_level: { type: String },
   registration_date: { type: String, required: true },
-  class: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }], // Relation avec la classe
+  classe: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }], // Relation avec la classe
 });
 const Student = mongoose.model("Student", studentSchema);
 module.exports = Student;

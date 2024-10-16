@@ -9,6 +9,7 @@ const userRoutes = require("./routes/userRoutes");
 
 const subjectRoutes = require("./routes/subjectRoutes");
 const classRoutes = require("./routes/classRoutes");
+const studentRoutes = require("./routes/studentRoutes");
 const port = process.env.PORT;
 dbConnect();
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/subject", subjectRoutes);
 app.use("/api/class", classRoutes);
+app.use("/api/student", studentRoutes);
 //Gestion des erreurs
 app.use(notFound);
 app.use(globalErrHandler);
