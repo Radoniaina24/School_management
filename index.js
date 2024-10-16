@@ -11,6 +11,7 @@ const subjectRoutes = require("./routes/subjectRoutes");
 const classRoutes = require("./routes/classRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
+const gradeRoutes = require("./routes/gradeRoutes");
 const port = process.env.PORT;
 dbConnect();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use("/api/subject", subjectRoutes);
 app.use("/api/class", classRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/teacher", teacherRoutes);
+app.use("/api/grade", gradeRoutes);
 
 //Gestion des erreurs
 app.use(notFound);
