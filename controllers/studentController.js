@@ -1,4 +1,5 @@
 const Student = require("../models/studentModel");
+const Class = require("../models/classModel");
 async function postStudent(req, res) {
   const {
     name,
@@ -11,7 +12,13 @@ async function postStudent(req, res) {
     registration_date,
     classe,
   } = req.body;
+
   try {
+    const classFound = await Class.findOne({ level: classe });
+    if (!classFound) {
+      throw new Error("La classe n'existe pas");
+    }
+
     const studentExist = await Student.findOne({ firstname });
     if (studentExist) {
       throw new Error("Student already exist");
@@ -26,7 +33,7 @@ async function postStudent(req, res) {
       email,
       school_level,
       registration_date,
-      classe,
+      classe: classFound._id,
     });
     await student.save();
     res.status(201).json({
@@ -59,6 +66,7 @@ async function getAllStudent(req, res) {
     }
     const tolaleStudents = await Student.countDocuments(searchQuery);
     const students = await Student.find(searchQuery)
+      .populate("classe")
       .skip((page - 1) * limit)
       .limit(limit);
 
