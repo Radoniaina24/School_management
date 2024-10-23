@@ -3,14 +3,20 @@ const Class = require("../models/classModel");
 async function postStudent(req, res) {
   const {
     name,
-    firstname,
+    first_name,
+    gender,
     date_of_birth,
-    dddress,
-    phone,
-    email,
-    school_level,
-    registration_date,
     classe,
+    address,
+    phone,
+    mail,
+    mother_name,
+    mother_occupation,
+    mother_phone,
+    father_name,
+    father_occupation,
+    father_phone,
+    submission,
   } = req.body;
 
   try {
@@ -19,20 +25,26 @@ async function postStudent(req, res) {
       throw new Error("La classe n'existe pas");
     }
 
-    const studentExist = await Student.findOne({ firstname });
+    const studentExist = await Student.findOne({ first_name });
     if (studentExist) {
       throw new Error("Student already exist");
     }
     //create student
     const student = await new Student({
       name,
-      firstname,
+      first_name,
+      gender,
       date_of_birth,
-      dddress,
+      address,
       phone,
-      email,
-      school_level,
-      registration_date,
+      mail,
+      mother_name,
+      mother_occupation,
+      mother_phone,
+      father_name,
+      father_occupation,
+      father_phone,
+      submission,
       classe: classFound._id,
     });
     await student.save();
@@ -84,30 +96,46 @@ async function updateStudent(req, res) {
   const id = req.params.id;
   const {
     name,
-    firstname,
+    first_name,
+    gender,
     date_of_birth,
-    dddress,
-    phone,
-    email,
-    school_level,
-    registration_date,
     classe,
+    address,
+    phone,
+    mail,
+    mother_name,
+    mother_occupation,
+    mother_phone,
+    father_name,
+    father_occupation,
+    father_phone,
+    submission,
   } = req.body;
 
   const query = { _id: id };
   try {
+    const classFound = await Class.findOne({ level: classe });
+    if (!classFound) {
+      throw new Error("La classe n'existe pas");
+    }
     await Student.findByIdAndUpdate(
       query,
       {
         name,
-        firstname,
+        first_name,
+        gender,
         date_of_birth,
-        dddress,
+        classe: classFound._id,
+        address,
         phone,
-        email,
-        school_level,
-        registration_date,
-        classe,
+        mail,
+        mother_name,
+        mother_occupation,
+        mother_phone,
+        father_name,
+        father_occupation,
+        father_phone,
+        submission,
       },
       { new: true, runValidators: true }
     );
