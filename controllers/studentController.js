@@ -72,11 +72,12 @@ async function getAllStudent(req, res) {
     const searchQuery = {};
     if (search) {
       searchQuery.$or = [
-        { firstname: { $regex: search, $options: "i" } },
+        { first_name: { $regex: search, $options: "i" } },
         { name: { $regex: search, $options: "i" } },
       ];
     }
     const tolaleStudents = await Student.countDocuments(searchQuery);
+    const totalPages = Math.ceil(tolaleStudents / limit);
     const students = await Student.find(searchQuery)
       .populate("classe")
       .skip((page - 1) * limit)
@@ -86,6 +87,7 @@ async function getAllStudent(req, res) {
       status: "success",
       message: "Student fetched successfully",
       totale: tolaleStudents,
+      totalPages,
       students,
     });
   } catch (error) {
