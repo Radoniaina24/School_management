@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 // Modèle Étudiant
 const studentSchema = new mongoose.Schema({
+  photo: { type: String },
   name: { type: String, required: true },
   first_name: { type: String, required: true },
   gender: { type: String, required: true },

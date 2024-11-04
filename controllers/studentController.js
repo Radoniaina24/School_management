@@ -1,6 +1,38 @@
 const Student = require("../models/studentModel");
 const Class = require("../models/classModel");
+const multer = require("multer");
+const sharp = require("sharp");
+
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage, fileFilter: multerFitler });
+const uploadStudentPhoto = upload.single("photo");
+
+function multerFitler(req, file, cb) {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Not image, please upload only image"), false);
+  }
+}
+
+function resizeStudentPhoto(req, res, next) {
+  if (!req.file) return next();
+  req.file.filename = `student-${req.params.id}-${Date.now()}.jpeg`;
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/students/${req.file.filename}`);
+
+  next();
+  // console.log(req);
+}
+
 async function postStudent(req, res) {
+  let photoStudent = "";
+  if (req.file) {
+    photoStudent = req.file.filename;
+  }
   const {
     name,
     first_name,
@@ -31,6 +63,7 @@ async function postStudent(req, res) {
     }
     //create student
     const student = await new Student({
+      photo: photoStudent,
       name,
       first_name,
       gender,
@@ -96,6 +129,10 @@ async function getAllStudent(req, res) {
 }
 async function updateStudent(req, res) {
   const id = req.params.id;
+  let photoStudent = "";
+  if (req.file) {
+    photoStudent = req.file.filename;
+  }
   const {
     name,
     first_name,
@@ -120,9 +157,11 @@ async function updateStudent(req, res) {
     if (!classFound) {
       throw new Error("La classe n'existe pas");
     }
+
     await Student.findByIdAndUpdate(
       query,
       {
+        photo: photoStudent,
         name,
         first_name,
         gender,
@@ -151,4 +190,6 @@ module.exports = {
   deleteStudent,
   getAllStudent,
   updateStudent,
+  uploadStudentPhoto,
+  resizeStudentPhoto,
 };
