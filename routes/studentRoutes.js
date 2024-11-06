@@ -4,7 +4,12 @@ const studentRoutes = express.Router();
 const studentContollers = require("../controllers/studentController");
 
 studentRoutes.get("/", asyncHandler(studentContollers.getAllStudent));
-studentRoutes.post("/register", asyncHandler(studentContollers.postStudent));
+studentRoutes.post(
+  "/register",
+  studentContollers.uploadStudentPhoto,
+  studentContollers.resizeStudentPhoto,
+  asyncHandler(studentContollers.postStudent)
+);
 studentRoutes.put(
   "/update/:id",
   studentContollers.uploadStudentPhoto,

@@ -2,6 +2,8 @@ const Student = require("../models/studentModel");
 const Class = require("../models/classModel");
 const multer = require("multer");
 const sharp = require("sharp");
+const path = require("path");
+const fs = require("fs").promises;
 
 const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage, fileFilter: multerFitler });
@@ -17,7 +19,8 @@ function multerFitler(req, file, cb) {
 
 function resizeStudentPhoto(req, res, next) {
   if (!req.file) return next();
-  req.file.filename = `student-${req.params.id}-${Date.now()}.jpeg`;
+  req.file.filename = `student-${Date.now()}.jpeg`;
+
   sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat("jpeg")
@@ -25,11 +28,10 @@ function resizeStudentPhoto(req, res, next) {
     .toFile(`public/img/students/${req.file.filename}`);
 
   next();
-  // console.log(req);
 }
 
 async function postStudent(req, res) {
-  let photoStudent = "";
+  let photoStudent = "default.png";
   if (req.file) {
     photoStudent = req.file.filename;
   }
@@ -92,11 +94,43 @@ async function postStudent(req, res) {
 async function deleteStudent(req, res) {
   const id = req.params.id;
   try {
-    await Student.deleteOne({ _id: id });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    // Récupérer l'étudiant à partir de MongoDB par ID
+    const student = await Student.findById(req.params.id);
+
+    if (!student) {
+      return res.status(404).json({ message: "Étudiant non trouvé" });
+    }
+    // Construire le chemin complet de l'image
+    const imagePath = path.join(
+      __dirname,
+      "../public/img/students",
+      student.photo
+    );
+    // Supprimer l'image du dossier si elle existe
+    if (student.photo !== "default.png") {
+      try {
+        await fs.unlink(imagePath); // Supprime l'image seulement si ce n'est pas "default.png"
+      } catch (err) {
+        if (err.code !== "ENOENT") throw err; // Ignore l'erreur si le fichier n'existe pas
+      }
+    }
+    // Supprimer l'étudiant de la base de données
+    await Student.findByIdAndDelete(req.params.id);
+    res
+      .status(200)
+      .json({ message: "Étudiant et image supprimés avec succès" });
+  } catch (error) {
+    // Si le fichier n'existe pas, ignorez l'erreur et continuez la suppression de l'étudiant
+    if (error.code === "ENOENT") {
+      await Student.findByIdAndDelete(req.params.id);
+      return res
+        .status(200)
+        .json({ message: "Étudiant supprimé, mais l'image n'existait pas" });
+    }
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la suppression de l'étudiant" });
   }
-  res.status(200).json({ message: "Student delete Successfully" });
 }
 async function getAllStudent(req, res) {
   // n'oublie pas de mettre des filtre par date
