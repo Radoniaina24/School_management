@@ -4,6 +4,7 @@ const studentRoutes = express.Router();
 const studentContollers = require("../controllers/studentController");
 
 studentRoutes.get("/", asyncHandler(studentContollers.getAllStudent));
+studentRoutes.get("/:id", asyncHandler(studentContollers.getStudentById));
 studentRoutes.post(
   "/register",
   studentContollers.uploadStudentPhoto,

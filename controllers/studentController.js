@@ -192,6 +192,36 @@ async function updateStudent(req, res) {
       throw new Error("La classe n'existe pas");
     }
 
+    // Récupérer l'étudiant actuel
+    const student = await Student.findById(id);
+    if (!student) {
+      return res.status(404).json({ message: "Étudiant introuvable" });
+    }
+    // Si une nouvelle photo est envoyée
+    if (req.file) {
+      photoStudent = req.file.filename; // Attribuer le nom de la nouvelle photo
+      // Supprimer l'ancienne photo si elle n'est pas la photo par défaut
+      if (student.photo && student.photo !== "default.png") {
+        const oldPhotoPath = path.join(
+          __dirname,
+          "public",
+          "img",
+          "students",
+          student.photo
+        );
+        fs.unlink(oldPhotoPath, (err) => {
+          if (err) {
+            console.error(
+              "Erreur lors de la suppression de l'ancienne photo:",
+              err
+            );
+          }
+        });
+      }
+    } else {
+      // Si aucune nouvelle photo n'est envoyée, garder l'ancienne photo
+      photoStudent = student.photo;
+    }
     await Student.findByIdAndUpdate(
       query,
       {
@@ -219,6 +249,16 @@ async function updateStudent(req, res) {
   }
   res.status(200).json({ message: "La student est à jour avec success" });
 }
+async function getStudentById(req, res) {
+  const id = req.params.id;
+  const student = await Student.findById(id).populate("classe");
+  if (!student) throw new Error("Student not found");
+  res.json({
+    status: "success",
+    message: "Student fetched successfully",
+    student,
+  });
+}
 module.exports = {
   postStudent,
   deleteStudent,
@@ -226,4 +266,5 @@ module.exports = {
   updateStudent,
   uploadStudentPhoto,
   resizeStudentPhoto,
+  getStudentById,
 };
