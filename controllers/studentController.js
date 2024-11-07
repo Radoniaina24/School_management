@@ -204,9 +204,7 @@ async function updateStudent(req, res) {
       if (student.photo && student.photo !== "default.png") {
         const oldPhotoPath = path.join(
           __dirname,
-          "public",
-          "img",
-          "students",
+          "../public/img/students",
           student.photo
         );
         fs.unlink(oldPhotoPath, (err) => {
