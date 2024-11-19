@@ -143,6 +143,7 @@ async function getAllStudent(req, res) {
         { name: { $regex: search, $options: "i" } },
       ];
     }
+    const allStudents = await Student.countDocuments();
     const tolaleStudents = await Student.countDocuments(searchQuery);
     const totalPages = Math.ceil(tolaleStudents / limit);
     const students = await Student.find(searchQuery)
@@ -156,6 +157,7 @@ async function getAllStudent(req, res) {
       totale: tolaleStudents,
       totalPages,
       students,
+      allStudents,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });

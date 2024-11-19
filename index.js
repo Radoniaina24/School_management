@@ -13,6 +13,7 @@ const classRoutes = require("./routes/classRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const gradeRoutes = require("./routes/gradeRoutes");
+const subjectClassRoutes = require("./routes/subjectClassRoutes");
 const port = process.env.PORT;
 dbConnect();
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use("/api/class", classRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/teacher", teacherRoutes);
 app.use("/api/grade", gradeRoutes);
+app.use("/api/subjectClass", subjectClassRoutes);
 app.use(
   "/img/students",
   express.static(path.join(__dirname, "public", "img", "students"))
