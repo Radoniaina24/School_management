@@ -8,7 +8,6 @@ async function isLoggedIn(req, res, next) {
   try {
     // Décodage et vérification du token
     const decoded = verifyToken(token);
-
     // Récupérer l'utilisateur correspondant et exclure le mot de passe
     const user = await User.findById(decoded.id).select("-password");
 

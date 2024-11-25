@@ -1,6 +1,10 @@
 const User = require("../models/userModel");
+const verifyToken = require("../utils/verifyToken");
 const bcrypt = require("bcrypt");
-const { generateToken } = require("../utils/generateToken");
+const {
+  generateToken,
+  generateRefreshToken,
+} = require("../utils/generateToken");
 
 // Inscription
 async function registerUser(req, res) {
@@ -38,9 +42,11 @@ async function login(req, res) {
 
   if (userFound && (await bcrypt.compare(password, userFound?.password))) {
     const token = generateToken(userFound?._id);
-
+    const refreshToken = generateRefreshToken(userFound?._id);
+    userFound.refreshToken = refreshToken;
+    userFound.save();
     // Ajouter le token dans un cookie HttpOnly
-    res.cookie("token", token, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true, // Le cookie ne peut pas être accédé via JavaScript
       secure: process.env.NODE_ENV === "production", // Utiliser HTTPS en production
       sameSite: "Strict", // Pour éviter l'envoi du cookie dans des contextes cross-site
@@ -50,7 +56,6 @@ async function login(req, res) {
     res.json({
       status: "success",
       message: "User logged in successfully",
-      userFound,
       token,
     });
   } else {
@@ -59,6 +64,9 @@ async function login(req, res) {
 }
 
 async function getMe(req, res) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Utilisateur non authentifié." });
+  }
   const user = req.user; // Injecté par le middleware `isLoggedIn`
   res.status(200).json({
     id: user._id,
@@ -71,16 +79,37 @@ async function getMe(req, res) {
 }
 
 async function logout(req, res) {
-  res.clearCookie("token", {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production", // Utiliser HTTPS en production
     sameSite: "Strict", // Pour éviter le CSRF
   });
   res.json({ message: "User logged out successfully" });
 }
+
+async function refreshAccessToken(req, res) {
+  const { refreshToken } = req.cookies;
+  if (!refreshToken) return res.status(401).json({ message: "Non autorisé." });
+
+  try {
+    const payload = verifyToken(refreshToken);
+    if (!payload) return res.status(401).json({ message: "Non autorisé." });
+
+    const user = await User.findById(payload.id);
+    if (!user || user.refreshToken !== refreshToken)
+      return res.status(403).json({ message: "Accès interdit." });
+
+    const newAccessToken = generateToken(user._id);
+    res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+}
+
 module.exports = {
   getMe,
   registerUser,
   login,
   logout,
+  refreshAccessToken,
 };

@@ -8,5 +8,9 @@ authRoutes.post("/register", asyncHandler(auhtContollers.registerUser));
 authRoutes.post("/login", asyncHandler(auhtContollers.login));
 authRoutes.get("/me", isLoggedIn, asyncHandler(auhtContollers.getMe));
 authRoutes.post("/logout", asyncHandler(auhtContollers.logout));
+authRoutes.post(
+  "/refresh-token",
+  asyncHandler(auhtContollers.refreshAccessToken)
+);
 
 module.exports = authRoutes;

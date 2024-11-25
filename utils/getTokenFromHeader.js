@@ -1,6 +1,15 @@
-
 function getTokenFromHeader(req) {
-    const token = req?.headers?.authorization?.split(' ')[1]
-    return token
+  // Vérifiez d'abord les en-têtes
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.split(" ")[1];
+  }
+  // Vérifiez ensuite les cookies
+  const token = req.cookies?.refreshToken;
+  if (token) {
+    return token;
+  }
+  return null;
 }
-module.exports = getTokenFromHeader
+module.exports = getTokenFromHeader;

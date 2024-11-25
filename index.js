@@ -1,11 +1,14 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 const cors = require("cors");
 const { globalErrHandler, notFound } = require("./middlewares/globaErrHandler");
 const path = require("path");
+app.use(cookieParser());
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:3000", // Autoriser le frontend à accéder à l'API
+  origin: "http://localhost:3000",
+  // "https://front-school-managment.vercel.app" || "http://localhost:3000", // Autoriser le frontend à accéder à l'API
   credentials: true, // Permet d'envoyer des cookies
 };
 app.use(cors(corsOptions));

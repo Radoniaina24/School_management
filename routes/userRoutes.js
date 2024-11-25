@@ -5,20 +5,12 @@ const userContollers = require("../controllers/userControllers");
 const isLoggedIn = require("../middlewares/isLoggedIn");
 
 userRoutes.get("/", asyncHandler(userContollers.getAllUser));
-userRoutes.get(
-  "/profile",
-  isLoggedIn,
-  asyncHandler(userContollers.getUserProfile)
-);
 userRoutes.get("/:uid", userContollers.getOneUser);
-//userRoutes.put(("/update/:uid"), userContollers.updateUser)
 userRoutes.post("/register", asyncHandler(userContollers.postUser));
-userRoutes.post("/login", asyncHandler(userContollers.loginUser));
 userRoutes.put(
-  "/update/shipping",
+  "/update/:uid",
   isLoggedIn,
-  asyncHandler(userContollers.updateShippingAddress)
+  asyncHandler(userContollers.updateUser)
 );
-userRoutes.put("/update/:uid", asyncHandler(userContollers.updateUser));
-userRoutes.delete("/delete/:uid", userContollers.deleteUser);
+userRoutes.delete("/delete/:uid", isLoggedIn, userContollers.deleteUser);
 module.exports = userRoutes;

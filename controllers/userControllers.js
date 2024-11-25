@@ -39,58 +39,6 @@ async function updateUser(req, res) {
   }
   res.status(200).json({ message: "L'utilisateur est à jour avec success" });
 }
-async function loginUser(req, res) {
-  const { email, password } = req.body;
-  const userFound = await User.findOne({ email });
-
-  if (userFound && (await bcrypt.compare(password, userFound?.password))) {
-    const token = generateToken(userFound?._id);
-    res.json({
-      status: "success",
-      message: "User logged in successfully",
-      userFound,
-      token,
-    });
-  } else {
-    throw new Error("Invalid login credentials");
-  }
-}
-async function updateShippingAddress(req, res) {
-  const {
-    firstName,
-    lastName,
-    address,
-    city,
-    postalCode,
-    province,
-    country,
-    phone,
-  } = req.body;
-  const user = await User.findByIdAndUpdate(
-    req.userAuthId,
-    {
-      shippingAddress: {
-        firstName,
-        lastName,
-        address,
-        city,
-        postalCode,
-        province,
-        country,
-        phone,
-      },
-      hasShippingAddress: true,
-    },
-    {
-      new: true,
-    }
-  );
-  res.json({
-    status: "success",
-    message: "User shipping address update successfully",
-    user,
-  });
-}
 async function deleteUser(req, res) {
   const uid = req.params.uid;
   try {
@@ -99,11 +47,6 @@ async function deleteUser(req, res) {
     res.status(400).json({ error: err.message });
   }
   res.status(200).json({ message: "success" });
-}
-async function getUserProfile(req, res) {
-  res.status(200).json({
-    message: "welcome to the profile page",
-  });
 }
 async function postUser(req, res) {
   const { username, email, password, role } = req.body;
@@ -135,11 +78,8 @@ async function postUser(req, res) {
 }
 module.exports = {
   getAllUser,
-  getUserProfile,
   postUser,
   getOneUser,
   deleteUser,
   updateUser,
-  loginUser,
-  updateShippingAddress,
 };
