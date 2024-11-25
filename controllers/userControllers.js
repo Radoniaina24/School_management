@@ -27,33 +27,6 @@ async function getOneUser(req, res) {
   }
   res.status(200).json({ user });
 }
-async function postUser(req, res) {
-  const { fullname, email, password } = req.body;
-  try {
-    const userExist = await User.findOne({ email });
-    if (userExist) {
-      throw new Error("User already exist");
-    }
-    //hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
-    //create user
-    const user = await new User({
-      fullname,
-      email,
-      password: hashPassword,
-    });
-    await user.save();
-    // OR
-    // const user = await User.create({name, email})
-    res.status(201).json({
-      message: "User registered Successfully",
-      data: user,
-    });
-  } catch (err) {
-    throw new Error(err.message);
-  }
-}
 async function updateUser(req, res) {
   const uid = req.params.uid;
   const { fullname, email } = req.body;
@@ -132,7 +105,34 @@ async function getUserProfile(req, res) {
     message: "welcome to the profile page",
   });
 }
-
+async function postUser(req, res) {
+  const { username, email, password, role } = req.body;
+  try {
+    const userExist = await User.findOne({ email });
+    if (userExist) {
+      throw new Error("User already exist");
+    }
+    //hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+    //create user
+    const user = await new User({
+      username,
+      email,
+      password: hashPassword,
+      role,
+    });
+    await user.save();
+    // OR
+    // const user = await User.create({name, email})
+    res.status(201).json({
+      message: "User registered Successfully",
+      data: user,
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
 module.exports = {
   getAllUser,
   getUserProfile,
